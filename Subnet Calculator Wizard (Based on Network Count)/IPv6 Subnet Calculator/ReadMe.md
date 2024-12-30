@@ -1,4 +1,4 @@
-# ** IPv6 Subnet Calculator (Based on Network Count) Documentation **
+# **IPv6 Subnet Calculator (Based on Network Count) Documentation**
 
 ## Overview
 
