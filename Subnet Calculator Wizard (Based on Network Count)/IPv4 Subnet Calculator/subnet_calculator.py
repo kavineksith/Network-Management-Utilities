@@ -28,10 +28,21 @@ class SubnetCalculator:
     def __init__(self, network_ip, num_networks):
         self.network_ip = network_ip
         self.num_networks = num_networks
+        self.network = None  # Initialize network as None to avoid reference errors
+
+        # Step 1: Validate the network IP address and its prefix
         self.validate_network_ip()
+
+        # Step 2: Calculate the prefix for the requested number of networks
         self.prefix = self.calculate_prefix_for_networks(num_networks)
-        self.network = ipaddress.IPv4Network(network_ip, strict=False)
-        self.subnets = list(self.network.subnets(new_prefix=self.prefix))
+        
+        # Step 3: Initialize the network object only if validation passed
+        if self.network_ip:
+            # Initialize the network object after validating
+            self.network = ipaddress.IPv4Network(self.network_ip, strict=False)
+            self.subnets = list(self.network.subnets(new_prefix=self.prefix))
+        else:
+            raise InvalidNetworkError("The IP address and prefix do not form a valid network.")
 
     def validate_network_ip(self):
         """ Validate if the network IP and prefix form a valid network. """
@@ -55,7 +66,7 @@ class SubnetCalculator:
             raise InvalidNetworkCountError()
         
         required_bits = math.ceil(math.log2(num_networks))
-        current_prefix = self.network.prefixlen
+        current_prefix = ipaddress.IPv4Network(self.network_ip, strict=False).prefixlen
         new_prefix = current_prefix + required_bits
         
         if new_prefix > 32:
